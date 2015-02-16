@@ -1,0 +1,29 @@
+{
+  "name": "echo-monitor",
+  "description": "",
+  "version": "0.0.1",
+  "author": "pmav",
+  "keywords": [
+    "monitor", "cpu", "disk", "ram", "memory", "network", "cli", "json", "usage", "utilization", "system"
+  ],
+  "main": "echo-monitor",
+  "bin": {
+    "echo-monitor": "./bin/echo-monitor"
+  },
+  "engine": [
+    "node >=0.6.0"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pmav/echo-monitor.git"
+  },
+  "dependencies": {
+  },
+  "bugs": {
+    "url": "https://github.com/pmav/echo-monitor/issues"
+  },
+  "licenses":[{
+    "type":"MIT",
+    "url":"https://github.com/pmav/echo-monitor/blob/master/LICENSE"
+  }]
+}
