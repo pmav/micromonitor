@@ -1,10 +1,10 @@
 {
   "name": "echo-monitor",
-  "description": "",
+  "description": "echo-monitor is a fast linux command line tool that outputs a number of metrics from your OS in plain text or json format",
   "version": "0.0.1",
   "author": "pmav",
   "keywords": [
-    "monitor", "cpu", "disk", "ram", "memory", "network", "cli", "json", "usage", "utilization", "system"
+    "monitor", "system", "cpu", "memory", "network", "processes", "disk", "cli", "json", "usage", "utilization"
   ],
   "main": "echo-monitor",
   "bin": {
