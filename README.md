@@ -4,6 +4,10 @@ echo-monitor is a fast linux command line tool that outputs a number of metrics 
 
 ### Metrics
 
+- Info
+ - Hostname
+ - Uname
+
 - System
  - Uptime
  - Idle time
@@ -14,7 +18,8 @@ echo-monitor is a fast linux command line tool that outputs a number of metrics 
  - State: user, system, nice, idle, IO wait, hardware interrupts, software interrupts, steal
 
 - Memory
- - TODO
+ - Physical: total, used, free, shared, buffers, cached 
+ - Swap: total, used, free
 
 - Network
  - TODO
@@ -29,7 +34,12 @@ echo-monitor is a fast linux command line tool that outputs a number of metrics 
 
 List of used commands, your OS must support this tools in order to echo-monitor to work.
 
-Generic metrics:
+Info:
+
+    uname -a
+    hostname
+
+System metrics:
 
     cat /proc/uptime
 
