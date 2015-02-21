@@ -15,7 +15,7 @@ function createStats(data)
 
   // Info
 
-  // TODO: hostname, uname, ip
+  // TODO: hostname, uname, ip, dns servers
 
   // System
   set(stats, 'generic.uptime', 'Uptime', data.generic.uptime, secondsToDisplay);
