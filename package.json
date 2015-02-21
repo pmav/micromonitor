@@ -1,29 +1,29 @@
 {
-  "name": "echo-monitor",
-  "description": "echo-monitor is a fast linux command line tool that outputs a number of metrics from your OS in plain text or json format",
+  "name": "micromonitor",
+  "description": "micromonitor is a fast linux command line tool that outputs a number of metrics from your OS in plain text or json format",
   "version": "0.0.1",
   "author": "pmav",
   "keywords": [
     "monitor", "system", "cpu", "memory", "network", "processes", "disk", "cli", "json", "usage", "utilization"
   ],
-  "main": "echo-monitor",
+  "main": "micromonitor",
   "bin": {
-    "echo-monitor": "./bin/echo-monitor"
+    "micromonitor": "./bin/micromonitor"
   },
   "engine": [
     "node >=0.6.0"
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/pmav/echo-monitor.git"
+    "url": "git://github.com/pmav/micromonitor.git"
   },
   "dependencies": {
   },
   "bugs": {
-    "url": "https://github.com/pmav/echo-monitor/issues"
+    "url": "https://github.com/pmav/micromonitor/issues"
   },
   "licenses":[{
     "type":"MIT",
-    "url":"https://github.com/pmav/echo-monitor/blob/master/LICENSE"
+    "url":"https://github.com/pmav/micromonitor/blob/master/LICENSE"
   }]
 }

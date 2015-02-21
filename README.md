@@ -1,6 +1,6 @@
-# echo-monitor
+# micromonitor
 
-echo-monitor is a fast linux command line tool that outputs a number of metrics from your OS in plain text or json format.
+micromonitor is a fast linux command line tool that outputs a number of metrics from your OS in plain text or json format.
 
 ### Metrics
 
@@ -32,7 +32,7 @@ echo-monitor is a fast linux command line tool that outputs a number of metrics 
 
 ### Commands
 
-List of used commands, your OS must support this tools in order to echo-monitor to work.
+List of used commands, your OS must support this tools in order to micromonitor to work.
 
 Info:
 
