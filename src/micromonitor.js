@@ -14,10 +14,10 @@ function createStats(data)
   var stats = {};
 
   // Info
-
-  // TODO: hostname, uname, ip, dns servers
-
+  // Exec time, micromonitor version
+  
   // System
+  // TODO: uname
   set(stats, 'generic.uptime', 'Uptime', data.generic.uptime, secondsToDisplay);
   set(stats, 'generic.idle', 'Idle time', data.generic.idle, secondsToDisplay);
 
@@ -54,12 +54,14 @@ function createStats(data)
   set(stats, 'cpu.memory.swap.free', 'Free swap', data.memory.swap.free, bytesToDisplay, data.memory.swap.free / data.memory.swap.total * 100);
 
   // Network
+  // TODO: hostname, , ip, dns servers
 
   // Disk
 
   // Processes
 
   // Output
+  // TODO yargs
   toJson(stats);
   toPlain(stats);
 }
