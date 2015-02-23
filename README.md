@@ -5,7 +5,7 @@ micromonitor is a fast linux command line tool that outputs a number of metrics 
 ### Metrics
 
 - Info
- - TODO: uname, Exec time, version
+ - TODO: uname, exec time, version
 
 - System
  - Uptime
@@ -37,8 +37,7 @@ List of commands used. Your OS must support these tools in order to micromonitor
 
 Info:
 
-    uname -a
-    hostname
+    TODO uname -a
 
 System metrics:
 
@@ -50,13 +49,7 @@ CPU metrics:
 
 Memory metrics:
 
-    cat /proc/meminfo
-    vmstat
-    free -m
-
-Network metrics:
-    
-    http://www.cyberciti.biz/faq/network-statistics-tools-rhel-centos-debian-linux/
+    free -b
 
 Partitions metrics:
 
@@ -64,9 +57,14 @@ Partitions metrics:
     TODO df -i
     TODO cat /proc/sys/fs/file-nr
 
+Network metrics:
+
+    TODO hostname
+    TODO http://www.cyberciti.biz/faq/network-statistics-tools-rhel-centos-debian-linux/
+
 Process metrics:
 
-    ps -eo pcpu,pid,user,args | sort -k 1 -r | head -10
+    TODO ps -eo pcpu,pid,user,args | sort -k 1 -r | head -10
   
 
 ### Example
