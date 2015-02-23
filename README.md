@@ -33,7 +33,7 @@ micromonitor is a fast linux command line tool that outputs a number of metrics 
 
 ### Commands
 
-List of used commands, your OS must support this tools in order to micromonitor to work.
+List of commands used. Your OS must support these tools in order to micromonitor to work.
 
 Info:
 
