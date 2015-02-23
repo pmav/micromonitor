@@ -14,12 +14,11 @@ function createStats(data)
   var stats = {};
 
   // Info
-  // Exec time, micromonitor version
+  // TODO
   
   // System
-  // TODO: uname
-  set(stats, 'generic.uptime', 'Uptime', data.generic.uptime, secondsToDisplay);
-  set(stats, 'generic.idle', 'Idle time', data.generic.idle, secondsToDisplay);
+  set(stats, 'system.uptime', 'Uptime', data.system.uptime, secondsToDisplay);
+  set(stats, 'system.idle', 'Idle time', data.system.idle, secondsToDisplay);
 
   // CPU
   set(stats, 'cpu.load.1min', 'CPU 1min load', data.cpu.load1min, floatToDisplay);
@@ -53,10 +52,30 @@ function createStats(data)
   set(stats, 'cpu.memory.swap.used', 'Used swap', data.memory.swap.used, bytesToDisplay, data.memory.swap.used / data.memory.swap.total * 100);
   set(stats, 'cpu.memory.swap.free', 'Free swap', data.memory.swap.free, bytesToDisplay, data.memory.swap.free / data.memory.swap.total * 100);
 
-  // Network
-  // TODO: hostname, , ip, dns servers
+  // Partitions
 
-  // Disk
+  var i = 1;
+  for (var property in data.partitions) {
+    if (data.partitions.hasOwnProperty(property)) {
+      var partition = data.partitions[property];
+
+
+
+      set(stats, 'partition.'+i+'.mount_point',  undefined, property);
+
+      set(stats, 'partition.'+i+'.device',  'Device', partition.device);
+      set(stats, 'partition.'+i+'.type',  'Type', partition.type);
+
+      set(stats, 'partition.'+i+'.total',  'Total', partition.total, bytesToDisplay);
+      set(stats, 'partition.'+i+'.used',  'Used', partition.used, bytesToDisplay, partition.used / partition.total * 100);
+      set(stats, 'partition.'+i+'.free',  'Free', partition.free, bytesToDisplay, partition.free / partition.total * 100);
+
+      i++;
+    }
+  }
+
+  // Network
+  // TODO
 
   // Processes
 
@@ -78,11 +97,19 @@ function set(stats, key, name, rawValue, toDisplayFunction, percentageValue)
     ref = ref[key];
   }
 
-  ref.name = name;
-  ref.raw = rawValue;
-  ref.display = toDisplayFunction(rawValue);
-  if (percentageValue !== undefined)
-    ref.percentage = percentageToDisplay(percentageValue);
+  if (name === undefined)
+  {
+    // TODO
+  }
+  else
+  {
+    ref.name = name;
+    ref.raw = rawValue;
+    if (toDisplayFunction !== undefined)
+      ref.display = toDisplayFunction(rawValue);
+    if (percentageValue !== undefined)
+      ref.percentage = percentageToDisplay(percentageValue);
+  }
 }
 
 // Convert
@@ -134,7 +161,11 @@ function bytesToDisplay(bytes)
     return kibytes + ' KiB';
 
   var mibytes = Math.floor(kibytes / 1024);
+  //if (mibytes < 1024)
   return mibytes + ' MiB';
+
+  //var gibytes = Math.floor(mibytes / 1024);
+  //return gibytes + ' GiB';
 }
 
 // Output
@@ -142,14 +173,16 @@ function bytesToDisplay(bytes)
 function toPlain(stats)
 {
   var walk = function(obj) {
+
     for (var property in obj) {
       if (obj.hasOwnProperty(property)) {
         var p = obj[property];
         if (typeof p === 'object' && p.name !== undefined) {
+          var display = p.display === undefined ? p.raw : p.display;
           if (p.percentage === undefined)
-            console.log(p.name + '\t' + p.display);
+            console.log(p.name + '\t' + display);
           else
-            console.log(p.name + '\t' + p.display + ' (' + p.percentage + ')');
+            console.log(p.name + '\t' + display + ' (' + p.percentage + ')');
         } else if (typeof p === 'object') {
           walk(p);
         }

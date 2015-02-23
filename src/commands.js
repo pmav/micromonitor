@@ -20,6 +20,7 @@ var Commands = {
         this.uptime();
         this.top();
         this.free();
+        this.df();
     },
 
     execute: function (command, callback)
@@ -42,11 +43,11 @@ var Commands = {
     {
         this.execute('cat /proc/uptime',
             function(output) {
-                Commands.data.generic = {}
+                Commands.data.system = {}
                 var tokens = output.trim().split(' ');
 
-                Commands.data.generic.uptime = Math.floor(tokens[0]);
-                Commands.data.generic.idle = Math.floor(tokens[1]);
+                Commands.data.system.uptime = Math.floor(tokens[0]);
+                Commands.data.system.idle = Math.floor(tokens[1]);
             });
     },
 
@@ -58,10 +59,10 @@ var Commands = {
                 var lines = output.split('\n');
 
                 // 1st line
-                var tokens = lines[0].replace(/,/g, '').split(' ');
-                Commands.data.cpu.load1min = Number(tokens[13]);
-                Commands.data.cpu.load5min = Number(tokens[14]);
-                Commands.data.cpu.load15min = Number(tokens[15]);
+                var tokens = lines[0].split(': ')[1].trim().replace(/,/g, '').split(' ');
+                Commands.data.cpu.load1min = Number(tokens[0]);
+                Commands.data.cpu.load5min = Number(tokens[1]);
+                Commands.data.cpu.load15min = Number(tokens[2]);
                 
                 // 2nd line
                 tokens = lines[1].split(' ');
@@ -107,6 +108,31 @@ var Commands = {
                 Commands.data.memory.swap.total = Number(tokens[1]);
                 Commands.data.memory.swap.used = Number(tokens[2]);
                 Commands.data.memory.swap.free = Number(tokens[3]);
+            });
+    },
+
+    df: function()
+    {
+        this.execute('df -T -x tmpfs -x rootfs -x devtmpfs --block-size=1',
+            function(output) {
+                Commands.data.partitions = {};
+                var lines = output.split('\n');
+
+                for(var i = 1; i < lines.length; i++)
+                {
+                    if (lines[i] === '')
+                        continue;
+
+                    var tokens = lines[i].replace(/\s+/g, ' ').split(' ');
+
+                    var mountPoint = tokens[6];
+                    Commands.data.partitions[mountPoint] = {};
+                    Commands.data.partitions[mountPoint].device = tokens[0];
+                    Commands.data.partitions[mountPoint].type = tokens[1];
+                    Commands.data.partitions[mountPoint].total = Number(tokens[2]);
+                    Commands.data.partitions[mountPoint].used = Number(tokens[3]);
+                    Commands.data.partitions[mountPoint].free = Number(tokens[4]);
+                }
             });
     }
 };
