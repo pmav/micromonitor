@@ -21,6 +21,7 @@ var Commands = {
         this.top();
         this.free();
         this.df();
+        this.dfi();
     },
 
     execute: function (command, callback)
@@ -115,7 +116,7 @@ var Commands = {
     {
         this.execute('df -T -x tmpfs -x rootfs -x devtmpfs --block-size=1',
             function(output) {
-                Commands.data.partitions = {};
+                Commands.data.partitions = Commands.data.partitions || {};
                 var lines = output.split('\n');
 
                 for(var i = 1; i < lines.length; i++)
@@ -126,12 +127,35 @@ var Commands = {
                     var tokens = lines[i].replace(/\s+/g, ' ').split(' ');
 
                     var mountPoint = tokens[6];
-                    Commands.data.partitions[mountPoint] = {};
+                    Commands.data.partitions[mountPoint] = Commands.data.partitions[mountPoint] || {};
                     Commands.data.partitions[mountPoint].device = tokens[0];
                     Commands.data.partitions[mountPoint].type = tokens[1];
                     Commands.data.partitions[mountPoint].total = Number(tokens[2]);
                     Commands.data.partitions[mountPoint].used = Number(tokens[3]);
                     Commands.data.partitions[mountPoint].free = Number(tokens[4]);
+                }
+            });
+    },
+
+    dfi: function()
+    {
+        this.execute('df -i -x tmpfs -x rootfs -x devtmpfs',
+            function(output) {
+                Commands.data.partitions = Commands.data.partitions || {};
+                var lines = output.split('\n');
+
+                for(var i = 1; i < lines.length; i++)
+                {
+                    if (lines[i] === '')
+                        continue;
+
+                    var tokens = lines[i].replace(/\s+/g, ' ').split(' ');
+
+                    var mountPoint = tokens[5];
+                    Commands.data.partitions[mountPoint] = Commands.data.partitions[mountPoint] || {};
+                    Commands.data.partitions[mountPoint].inodes_total = Number(tokens[1]);
+                    Commands.data.partitions[mountPoint].inodes_used = Number(tokens[2]);
+                    Commands.data.partitions[mountPoint].inodes_free = Number(tokens[3]);
                 }
             });
     }

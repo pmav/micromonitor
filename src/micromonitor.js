@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+var VERSION = '1.0.0';
+
 var commands = require('./commands');
 
 function main()
@@ -14,8 +16,11 @@ function createStats(data)
   var stats = {};
 
   // Info
-  // TODO
-  
+  set(stats, 'info.version', 'Version', VERSION);
+  set(stats, 'info.collect_date', 'Collect date', Math.floor(new Date().getTime() / 1000));
+  set(stats, 'info.exec_time', 'Execution time', ''); // TODO
+  set(stats, 'info.uname', 'uname', ''); // TODO
+
   // System
   set(stats, 'system.uptime', 'Uptime', data.system.uptime, secondsToDisplay);
   set(stats, 'system.idle', 'Idle time', data.system.idle, secondsToDisplay);
@@ -54,23 +59,20 @@ function createStats(data)
 
   // Partitions
 
-  var i = 1;
   for (var property in data.partitions) {
     if (data.partitions.hasOwnProperty(property)) {
       var partition = data.partitions[property];
 
+      //set(stats, 'partition.' + property,  undefined, property);
+      //set(stats, 'partition.' + property + '.device', 'Device', partition.device);
+      //set(stats, 'partition.' + property + '.type', 'Type', partition.type);
+      set(stats, 'partition.' + property + '.total', property + ' total', partition.total, bytesToDisplay);
+      set(stats, 'partition.' + hasOwnProperty + '.used', property + ' used', partition.used, bytesToDisplay, partition.used / partition.total * 100);
+      set(stats, 'partition.' + property + '.free', property + ' free', partition.free, bytesToDisplay, partition.free / partition.total * 100);
 
-
-      set(stats, 'partition.'+i+'.mount_point',  undefined, property);
-
-      set(stats, 'partition.'+i+'.device',  'Device', partition.device);
-      set(stats, 'partition.'+i+'.type',  'Type', partition.type);
-
-      set(stats, 'partition.'+i+'.total',  'Total', partition.total, bytesToDisplay);
-      set(stats, 'partition.'+i+'.used',  'Used', partition.used, bytesToDisplay, partition.used / partition.total * 100);
-      set(stats, 'partition.'+i+'.free',  'Free', partition.free, bytesToDisplay, partition.free / partition.total * 100);
-
-      i++;
+      set(stats, 'partition.' + property + '.inodes_total', property + ' inodes total', partition.inodes_total);
+      set(stats, 'partition.' + property + '.inodes_used', property + ' inodes used', partition.inodes_used, undefined, partition.inodes_used / partition.inodes_total * 100);
+      set(stats, 'partition.' + property + '.inodes_free', property + ' inodes free', partition.inodes_free, undefined, partition.inodes_free / partition.inodes_total * 100);
     }
   }
 
@@ -78,6 +80,7 @@ function createStats(data)
   // TODO
 
   // Processes
+  // TODO
 
   // Output
   // TODO yargs
@@ -97,17 +100,14 @@ function set(stats, key, name, rawValue, toDisplayFunction, percentageValue)
     ref = ref[key];
   }
 
-  if (name === undefined)
-  {
-    // TODO
-  }
-  else
-  {
+  if (name === undefined) {
+    ref.name = rawValue;
+  } else {
     ref.name = name;
     ref.raw = rawValue;
     if (toDisplayFunction !== undefined)
       ref.display = toDisplayFunction(rawValue);
-    if (percentageValue !== undefined)
+    if (percentageValue !== undefined && !isNaN(percentageValue))
       ref.percentage = percentageToDisplay(percentageValue);
   }
 }

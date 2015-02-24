@@ -5,7 +5,10 @@ micromonitor is a fast linux command line tool that outputs a number of metrics 
 ### Metrics
 
 - Info
- - TODO: uname, exec time, version
+ - Version
+ - Collect date
+ - Execution time
+ - uname report
 
 - System
  - Uptime
@@ -23,10 +26,12 @@ micromonitor is a fast linux command line tool that outputs a number of metrics 
 - Partitions
  - Device, mount point, type
  - Space: total, used, free
- - TODO inodes
+ - Inodes: total, used, free
 
 - Network
- - TODO: hostname, ip by interface, dns servers
+ - hostname
+ - ip by interface
+ - dns servers
 
 - Processes
  - TODO
