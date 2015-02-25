@@ -1,163 +1,168 @@
 
 var exec = require('child_process').exec;
+var data = {};
+var count = 0;
+var onEndCallback = undefined;
 
 module.exports = {
   run: function (callback) {
-    Commands.run(callback);
+    onEndCallback = callback;
+    
+    // Run commands
+    uname();
+    uptime();
+    top();
+    free();
+    df();
+    dfi();
   }
 };
 
-var Commands = {
-    data: {},
-    count: 0,
-    callback: undefined,
+// Execution
 
-    run: function(callback)
-    {
-        this.callback = callback;
-        this.data = {};
+function execute(command, callback)
+{
+    count++;
+    exec(command, function (error, stdout, stderr) {
+        callback(stdout);
+        executionFinish();
+    });
+}
 
-        this.uptime();
-        this.top();
-        this.free();
-        this.df();
-        this.dfi();
-    },
+function executionFinish()
+{
+    count--;
+    if (count === 0)
+        onEndCallback(data);
+}
 
-    execute: function (command, callback)
-    {
-        this.count++;
-        exec(command, function (error, stdout, stderr) {
-            callback(stdout);
-            Commands.executionFinish();
+// Commands
+
+function uname()
+{
+    execute('uname -a',
+        function(output) {
+            data.info = {};
+            data.info.uname = output.trim();
         });
-    },
+}
 
-    executionFinish: function()
-    {
-        Commands.count--;
-        if (Commands.count === 0)
-            Commands.callback(Commands.data);
-    },
+function uptime()
+{
+    execute('cat /proc/uptime',
+        function(output) {
+            data.system = {};
+            var tokens = output.trim().split(' ');
 
-    uptime: function()
-    {
-        this.execute('cat /proc/uptime',
-            function(output) {
-                Commands.data.system = {}
-                var tokens = output.trim().split(' ');
+            data.system.uptime = Math.floor(tokens[0]);
+            data.system.idle = Math.floor(tokens[1]);
+        });
+}
 
-                Commands.data.system.uptime = Math.floor(tokens[0]);
-                Commands.data.system.idle = Math.floor(tokens[1]);
-            });
-    },
+function top()
+{
+    execute('top -bn 1 | head -n 3',
+        function(output) {
+            data.cpu = {};
+            var lines = output.split('\n');
 
-    top: function()
-    {
-        this.execute('top -bn 1 | head -n 3',
-            function(output) {
-                Commands.data.cpu = {};
-                var lines = output.split('\n');
+            // 1st line
+            var tokens = lines[0].split(': ')[1].trim().replace(/,/g, '').split(' ');
+            data.cpu.load1min = Number(tokens[0]);
+            data.cpu.load5min = Number(tokens[1]);
+            data.cpu.load15min = Number(tokens[2]);
+            
+            // 2nd line
+            tokens = lines[1].split(' ');
+            data.cpu.tasksTotal = Number(tokens[2]);
+            data.cpu.tasksRunning = Number(tokens[6]);
+            data.cpu.tasksSleeping = Number(tokens[9]);
+            data.cpu.tasksStopped = Number(tokens[13]);
+            data.cpu.tasksZombie = Number(tokens[17]);
 
-                // 1st line
-                var tokens = lines[0].split(': ')[1].trim().replace(/,/g, '').split(' ');
-                Commands.data.cpu.load1min = Number(tokens[0]);
-                Commands.data.cpu.load5min = Number(tokens[1]);
-                Commands.data.cpu.load15min = Number(tokens[2]);
-                
-                // 2nd line
-                tokens = lines[1].split(' ');
-                Commands.data.cpu.tasksTotal = Number(tokens[2]);
-                Commands.data.cpu.tasksRunning = Number(tokens[6]);
-                Commands.data.cpu.tasksSleeping = Number(tokens[9]);
-                Commands.data.cpu.tasksStopped = Number(tokens[13]);
-                Commands.data.cpu.tasksZombie = Number(tokens[17]);
+            // 3rd line
+            tokens = lines[2].split(' ');
+            data.cpu.user = Number(tokens[2]);
+            data.cpu.system = Number(tokens[5]);
+            data.cpu.nice = Number(tokens[8]);
+            data.cpu.idle = Number(tokens[10]);
+            data.cpu.ioWait = Number(tokens[13]);
+            data.cpu.hi = Number(tokens[16]);
+            data.cpu.si = Number(tokens[19]);
+            data.cpu.steal = Number(tokens[22]);
+        });
+}
 
-                // 3rd line
-                tokens = lines[2].split(' ');
-                Commands.data.cpu.user = Number(tokens[2]);
-                Commands.data.cpu.system = Number(tokens[5]);
-                Commands.data.cpu.nice = Number(tokens[8]);
-                Commands.data.cpu.idle = Number(tokens[10]);
-                Commands.data.cpu.ioWait = Number(tokens[13]);
-                Commands.data.cpu.hi = Number(tokens[16]);
-                Commands.data.cpu.si = Number(tokens[19]);
-                Commands.data.cpu.steal = Number(tokens[22]);
-            });
-    },
+function free()
+{
+    execute('free -b',
+        function(output) {
+            data.memory = {}
+            var lines = output.split('\n');
 
-    free: function()
-    {
-        this.execute('free -b',
-            function(output) {
-                Commands.data.memory = {}
-                var lines = output.split('\n');
+            // 2nd line
+            var tokens = lines[1].split(/\s+/);
+            data.memory.physical = {};
+            data.memory.physical.total = Number(tokens[1]);
+            data.memory.physical.used = Number(tokens[2]);
+            data.memory.physical.free = Number(tokens[3]);
+            data.memory.physical.shared = Number(tokens[4]);
+            data.memory.physical.buffers = Number(tokens[5]);
+            data.memory.physical.cached = Number(tokens[6]);
 
-                // 2nd line
-                var tokens = lines[1].split(/\s+/);
-                Commands.data.memory.physical = {};
-                Commands.data.memory.physical.total = Number(tokens[1]);
-                Commands.data.memory.physical.used = Number(tokens[2]);
-                Commands.data.memory.physical.free = Number(tokens[3]);
-                Commands.data.memory.physical.shared = Number(tokens[4]);
-                Commands.data.memory.physical.buffers = Number(tokens[5]);
-                Commands.data.memory.physical.cached = Number(tokens[6]);
+            // 4th line
+            tokens = lines[3].split(/\s+/);
+            data.memory.swap = {};
+            data.memory.swap.total = Number(tokens[1]);
+            data.memory.swap.used = Number(tokens[2]);
+            data.memory.swap.free = Number(tokens[3]);
+        });
+}
 
-                // 4th line
-                tokens = lines[3].split(/\s+/);
-                Commands.data.memory.swap = {};
-                Commands.data.memory.swap.total = Number(tokens[1]);
-                Commands.data.memory.swap.used = Number(tokens[2]);
-                Commands.data.memory.swap.free = Number(tokens[3]);
-            });
-    },
+function df()
+{
+    execute('df -T -x tmpfs -x rootfs -x devtmpfs --block-size=1',
+        function(output) {
+            data.partitions = data.partitions || {};
+            var lines = output.split('\n');
 
-    df: function()
-    {
-        this.execute('df -T -x tmpfs -x rootfs -x devtmpfs --block-size=1',
-            function(output) {
-                Commands.data.partitions = Commands.data.partitions || {};
-                var lines = output.split('\n');
+            for(var i = 1; i < lines.length; i++)
+            {
+                if (lines[i] === '')
+                    continue;
 
-                for(var i = 1; i < lines.length; i++)
-                {
-                    if (lines[i] === '')
-                        continue;
+                var tokens = lines[i].replace(/\s+/g, ' ').split(' ');
 
-                    var tokens = lines[i].replace(/\s+/g, ' ').split(' ');
+                var mountPoint = tokens[6];
+                data.partitions[mountPoint] = data.partitions[mountPoint] || {};
+                data.partitions[mountPoint].device = tokens[0];
+                data.partitions[mountPoint].type = tokens[1];
+                data.partitions[mountPoint].total = Number(tokens[2]);
+                data.partitions[mountPoint].used = Number(tokens[3]);
+                data.partitions[mountPoint].free = Number(tokens[4]);
+            }
+        });
+}
 
-                    var mountPoint = tokens[6];
-                    Commands.data.partitions[mountPoint] = Commands.data.partitions[mountPoint] || {};
-                    Commands.data.partitions[mountPoint].device = tokens[0];
-                    Commands.data.partitions[mountPoint].type = tokens[1];
-                    Commands.data.partitions[mountPoint].total = Number(tokens[2]);
-                    Commands.data.partitions[mountPoint].used = Number(tokens[3]);
-                    Commands.data.partitions[mountPoint].free = Number(tokens[4]);
-                }
-            });
-    },
+function dfi()
+{
+    execute('df -i -x tmpfs -x rootfs -x devtmpfs',
+        function(output) {
+            data.partitions = data.partitions || {};
+            var lines = output.split('\n');
 
-    dfi: function()
-    {
-        this.execute('df -i -x tmpfs -x rootfs -x devtmpfs',
-            function(output) {
-                Commands.data.partitions = Commands.data.partitions || {};
-                var lines = output.split('\n');
+            for(var i = 1; i < lines.length; i++)
+            {
+                if (lines[i] === '')
+                    continue;
 
-                for(var i = 1; i < lines.length; i++)
-                {
-                    if (lines[i] === '')
-                        continue;
+                var tokens = lines[i].replace(/\s+/g, ' ').split(' ');
 
-                    var tokens = lines[i].replace(/\s+/g, ' ').split(' ');
-
-                    var mountPoint = tokens[5];
-                    Commands.data.partitions[mountPoint] = Commands.data.partitions[mountPoint] || {};
-                    Commands.data.partitions[mountPoint].inodes_total = Number(tokens[1]);
-                    Commands.data.partitions[mountPoint].inodes_used = Number(tokens[2]);
-                    Commands.data.partitions[mountPoint].inodes_free = Number(tokens[3]);
-                }
-            });
-    }
-};
-    
+                var mountPoint = tokens[5];
+                data.partitions[mountPoint] = data.partitions[mountPoint] || {};
+                data.partitions[mountPoint].inodes_total = Number(tokens[1]);
+                data.partitions[mountPoint].inodes_used = Number(tokens[2]);
+                data.partitions[mountPoint].inodes_free = Number(tokens[3]);
+            }
+        });
+}

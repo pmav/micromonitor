@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
-var VERSION = '1.0.0';
-
 var commands = require('./commands');
+var version = '1.0.0';
 
 function main()
 {
@@ -16,10 +15,10 @@ function createStats(data)
   var stats = {};
 
   // Info
-  set(stats, 'info.version', 'Version', VERSION);
+  set(stats, 'info.version', 'Version', version);
   set(stats, 'info.collect_date', 'Collect date', Math.floor(new Date().getTime() / 1000));
   set(stats, 'info.exec_time', 'Execution time', ''); // TODO
-  set(stats, 'info.uname', 'uname', ''); // TODO
+  set(stats, 'info.uname', 'uname', data.info.uname);
 
   // System
   set(stats, 'system.uptime', 'Uptime', data.system.uptime, secondsToDisplay);
