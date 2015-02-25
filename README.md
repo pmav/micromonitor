@@ -42,7 +42,7 @@ List of commands used. Your OS must support these tools in order to micromonitor
 
 Info:
 
-    TODO uname -a
+    uname -a
 
 System metrics:
 
@@ -59,7 +59,7 @@ Memory metrics:
 Partitions metrics:
 
     df -T -x tmpfs -x rootfs -x devtmpfs --block-size=1
-    TODO df -i
+    df -i
     TODO cat /proc/sys/fs/file-nr
 
 Network metrics:
