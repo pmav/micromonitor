@@ -28,12 +28,15 @@ micromonitor is a fast linux command line tool that outputs a number of metrics 
  - Space: total, used, free
  - Inodes: total, used, free
 
-- Network
+- Network (TODO)
  - hostname
- - ip by interface
- - dns servers
+ - inet addr
+ - RX packets, errors, dropped, overruns, frame
+ - TX packets, errors, dropped, overruns, carrier
+ - RX bytes
+ - TX bytes
 
-- Processes
+- Processes (TODO)
  - TODO
 
 ### Commands
@@ -44,28 +47,29 @@ Info:
 
     uname -a
 
-System metrics:
+System:
 
     cat /proc/uptime
 
-CPU metrics:
+CPU:
 
     top -bn 1 | head -n 3
 
-Memory metrics:
+Memory:
 
     free -b
 
-Partitions metrics:
+Partitions:
 
     df -T -x tmpfs -x rootfs -x devtmpfs --block-size=1
     df -i
-    TODO cat /proc/sys/fs/file-nr
+    cat /proc/sys/fs/file-nr (TODO)
 
 Network metrics:
 
-    TODO hostname
-    TODO http://www.cyberciti.biz/faq/network-statistics-tools-rhel-centos-debian-linux/
+    hostname (TODO)
+    ip -s addr (TOOO)
+    ip -s link (TOOO)
 
 Process metrics:
 

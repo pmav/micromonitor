@@ -2,22 +2,30 @@
 
 var commands = require('./commands');
 var version = '1.0.0';
+var executionTime;
 
 function main()
 {
   // Run commands to get data.
+
+  executionTime = process.hrtime();
   commands.run(createStats);
 }
 
 function createStats(data)
 {
+  var elapsed = process.hrtime(executionTime);
+  executionTime = (elapsed[0] * 1000) + Math.floor(elapsed[1] / 1000000);
+  
+  var collectDate = new Date();
+
   // Stats
   var stats = {};
 
   // Info
   set(stats, 'info.version', 'Version', version);
-  set(stats, 'info.collect_date', 'Collect date', Math.floor(new Date().getTime() / 1000));
-  set(stats, 'info.exec_time', 'Execution time', ''); // TODO
+  set(stats, 'info.collect_date', 'Collect date', Math.floor(collectDate.getTime() / 1000), dateToDisplay);
+  set(stats, 'info.exec_time', 'Execution time', executionTime);
   set(stats, 'info.uname', 'uname', data.info.uname);
 
   // System
@@ -165,6 +173,10 @@ function bytesToDisplay(bytes)
 
   //var gibytes = Math.floor(mibytes / 1024);
   //return gibytes + ' GiB';
+}
+
+function dateToDisplay(milliseconds) {
+  return new Date(milliseconds * 1000).toISOString();
 }
 
 // Output
