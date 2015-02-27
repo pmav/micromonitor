@@ -81,7 +81,7 @@ function top()
             data.cpu.tasksZombie = Number(tokens[17]);
 
             // 3rd line
-            tokens = lines[2].split(' ');
+            tokens = lines[2].replace(/\%/g, ' ').trim().split(' ');
             data.cpu.user = Number(tokens[2]);
             data.cpu.system = Number(tokens[5]);
             data.cpu.nice = Number(tokens[8]);

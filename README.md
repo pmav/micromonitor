@@ -2,6 +2,10 @@
 
 micromonitor is a fast linux command line tool that outputs a number of metrics from your OS in plain text or json format.
 
+### How to use
+
+TODO
+
 ### Metrics
 
 - Info
@@ -74,9 +78,8 @@ Network metrics:
 Process metrics:
 
     TODO ps -eo pcpu,pid,user,args | sort -k 1 -r | head -10
-  
 
-### Example
+### Output
 
 Output example in plain text.
 ```

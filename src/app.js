@@ -1,21 +1,26 @@
 #!/usr/bin/env node
 
 var commands = require('./commands');
-var version = '1.0.0';
+var version = '0.0.4';
 var executionTime;
 
 function main()
 {
   // Run commands to get data.
 
-  executionTime = process.hrtime();
+  executionTime = process.hrtime === undefined ? new Date() : process.hrtime();
   commands.run(createStats);
 }
 
 function createStats(data)
 {
-  var elapsed = process.hrtime(executionTime);
-  executionTime = (elapsed[0] * 1000) + Math.floor(elapsed[1] / 1000000);
+  if (process.hrtime === undefined) {
+    executionTime = (new Date() - executionTime);
+
+  } else {
+    var elapsed = process.hrtime(executionTime);
+    executionTime = (elapsed[0] * 1000) + Math.floor(elapsed[1] / 1000000);
+  }
   
   var collectDate = new Date();
 
@@ -74,7 +79,7 @@ function createStats(data)
       //set(stats, 'partition.' + property + '.device', 'Device', partition.device);
       //set(stats, 'partition.' + property + '.type', 'Type', partition.type);
       set(stats, 'partition.' + property + '.total', property + ' total', partition.total, bytesToDisplay);
-      set(stats, 'partition.' + hasOwnProperty + '.used', property + ' used', partition.used, bytesToDisplay, partition.used / partition.total * 100);
+      set(stats, 'partition.' + property + '.used', property + ' used', partition.used, bytesToDisplay, partition.used / partition.total * 100);
       set(stats, 'partition.' + property + '.free', property + ' free', partition.free, bytesToDisplay, partition.free / partition.total * 100);
 
       set(stats, 'partition.' + property + '.inodes_total', property + ' inodes total', partition.inodes_total);
@@ -91,7 +96,7 @@ function createStats(data)
 
   // Output
   // TODO yargs
-  toJson(stats);
+  //toJson(stats);
   toPlain(stats);
 }
 
