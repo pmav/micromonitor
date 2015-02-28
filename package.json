@@ -1,7 +1,7 @@
 {
   "name": "micromonitor",
   "description": "micromonitor is a fast linux command line tool that outputs a number of metrics from your OS in plain text or json format",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "pmav",
   "preferGlobal": true,
   "keywords": [

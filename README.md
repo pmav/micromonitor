@@ -13,6 +13,7 @@ TODO
  - Collect date
  - Execution time
  - uname report
+ - Metric count (TODO)
 
 - System
  - Uptime
@@ -34,11 +35,9 @@ TODO
 
 - Network (TODO)
  - hostname
- - inet addr
- - RX packets, errors, dropped, overruns, frame
- - TX packets, errors, dropped, overruns, carrier
- - RX bytes
- - TX bytes
+ - inet/inet6 addr
+ - RX: bytes, packets, errors, dropped, overrun, mcast
+ - TX: bytes, packets, errors, dropped, carrier, collsns
 
 - Processes (TODO)
  - TODO
@@ -69,13 +68,13 @@ Partitions:
     df -i
     cat /proc/sys/fs/file-nr (TODO)
 
-Network metrics:
+Network:
 
-    hostname (TODO)
-    ip -s addr (TOOO)
-    ip -s link (TOOO)
+    hostname
+    ip -s link
+    ip -s addr (TOOO) (inet/inet6)
 
-Process metrics:
+Process:
 
     TODO ps -eo pcpu,pid,user,args | sort -k 1 -r | head -10
 
@@ -83,53 +82,80 @@ Process metrics:
 
 Output example in plain text.
 ```
-Version 1.0.0
-Collect date  1424904532
-Execution time  
+Version 0.0.5
+Collect date  2015-02-28T00:24:32.000Z
+Execution time  753
 uname Linux raspberrypi 3.12.32+ #721 PREEMPT Fri Nov 7 16:50:31 GMT 2014 armv6l GNU/Linux
-Uptime  2d 15h 20m 32s
-Idle time 2d 13h 26m 10s
-CPU 1min load 0.26
-CPU 5min load 0.31
-CPU 15min load  0.27
-Total tasks 75
+Uptime  7h 39m 40s
+Idle time 6h 56m 2s
+CPU 1min load 0.32
+CPU 5min load 0.28
+CPU 15min load  0.36
+Total tasks 73
 Running tasks 2
-Sleeping tasks  73
+Sleeping tasks  71
 Stopped tasks 0
 Zombie tasks  0
-CPU % user  1.8 %
-CPU % system  0.7 %
+CPU % user  4.59 %
+CPU % system  1.7 %
 CPU % nice  0 %
-CPU % idle  97 %
-CPU % IO wait 0.4 %
+CPU % idle  90.5 %
+CPU % IO wait 3.1 %
 CPU % hardware interrupts 0 %
-CPU % software interrupts 0.1 %
+CPU % software interrupts 0.2 %
 CPU % steal 0 %
 Total physical memory 484 MiB
-Used physical memory  472 MiB (97.39 %)
-Free physical memory  12 MiB (2.6 %)
+Used physical memory  471 MiB (97.26 %)
+Free physical memory  13 MiB (2.73 %)
 Shared physical memory  0 B (0 %)
-Buffers physical memory 44 MiB (9.15 %)
-Cached physical memory  364 MiB (75.13 %)
+Buffers physical memory 51 MiB (10.57 %)
+Cached physical memory  342 MiB (70.71 %)
 Total swap  99 MiB
 Used swap 0 B (0 %)
 Free swap 99 MiB (100 %)
 / total 14909 MiB
-/ free  11403 MiB (76.48 %)
+/ used  3090 MiB (20.72 %)
+/ free  11169 MiB (74.91 %)
 / inodes total  957712
-/ inodes used 90613 (9.46 %)
-/ inodes free 867099 (90.53 %)
-/boot used  9 MiB (17.26 %)
+/ inodes used 93557 (9.76 %)
+/ inodes free 864155 (90.23 %)
 /media/MyBook2 total  1877634 MiB
+/media/MyBook2 used 103848 MiB (5.53 %)
 /media/MyBook2 free 1678385 MiB (89.38 %)
 /media/MyBook2 inodes total 122093568
-/media/MyBook2 inodes used  1187 (0 %)
-/media/MyBook2 inodes free  122092381 (99.99 %)
+/media/MyBook2 inodes used  1235 (0 %)
+/media/MyBook2 inodes free  122092333 (99.99 %)
 /boot total 55 MiB
-/boot free  46 MiB (82.73 %)
+/boot used  14 MiB (25.7 %)
+/boot free  41 MiB (74.29 %)
 /boot inodes total  0
 /boot inodes used 0
 /boot inodes free 0
+Hostname  raspberrypi
+lo receive bytes  6 KiB
+lo receive packets  114
+lo receive errors 0
+lo receive dropped  0
+lo receive overrun  0
+lo receive multicast  0
+lo transmit bytes 6 KiB
+lo transmit packets 114
+lo transmit errors  0
+lo transmit dropped 0
+lo transmit carrier 0
+lo transmit collisions  0
+eth0 receive bytes  186 MiB
+eth0 receive packets  351131
+eth0 receive errors 0
+eth0 receive dropped  0
+eth0 receive overrun  0
+eth0 receive multicast  0
+eth0 transmit bytes 262 MiB
+eth0 transmit packets 402326
+eth0 transmit errors  0
+eth0 transmit dropped 0
+eth0 transmit carrier 0
+eth0 transmit collisions  0
 ```
 
 Output example in json format.
@@ -138,15 +164,16 @@ Output example in json format.
   "info": {
     "version": {
       "name": "Version",
-      "raw": "1.0.0"
+      "raw": "0.0.5"
     },
     "collect_date": {
       "name": "Collect date",
-      "raw": 1424904532
+      "raw": 1425083072,
+      "display": "2015-02-28T00:24:32.000Z"
     },
     "exec_time": {
       "name": "Execution time",
-      "raw": ""
+      "raw": 753
     },
     "uname": {
       "name": "uname",
@@ -156,38 +183,38 @@ Output example in json format.
   "system": {
     "uptime": {
       "name": "Uptime",
-      "raw": 228032,
-      "display": "2d 15h 20m 32s"
+      "raw": 27580,
+      "display": "7h 39m 40s"
     },
     "idle": {
       "name": "Idle time",
-      "raw": 221170,
-      "display": "2d 13h 26m 10s"
+      "raw": 24962,
+      "display": "6h 56m 2s"
     }
   },
   "cpu": {
     "load": {
       "1min": {
         "name": "CPU 1min load",
-        "raw": 0.26,
-        "display": "0.26"
+        "raw": 0.32,
+        "display": "0.32"
       },
       "5min": {
         "name": "CPU 5min load",
-        "raw": 0.31,
-        "display": "0.31"
+        "raw": 0.28,
+        "display": "0.28"
       },
       "15min": {
         "name": "CPU 15min load",
-        "raw": 0.27,
-        "display": "0.27"
+        "raw": 0.36,
+        "display": "0.36"
       }
     },
     "tasks": {
       "total": {
         "name": "Total tasks",
-        "raw": 75,
-        "display": "75"
+        "raw": 73,
+        "display": "73"
       },
       "running": {
         "name": "Running tasks",
@@ -196,8 +223,8 @@ Output example in json format.
       },
       "sleeping": {
         "name": "Sleeping tasks",
-        "raw": 73,
-        "display": "73"
+        "raw": 71,
+        "display": "71"
       },
       "stopped": {
         "name": "Stopped tasks",
@@ -213,13 +240,13 @@ Output example in json format.
     "state": {
       "user": {
         "name": "CPU % user",
-        "raw": 1.8,
-        "display": "1.8 %"
+        "raw": 4.6,
+        "display": "4.59 %"
       },
       "system": {
         "name": "CPU % system",
-        "raw": 0.7,
-        "display": "0.7 %"
+        "raw": 1.7,
+        "display": "1.7 %"
       },
       "nice": {
         "name": "CPU % nice",
@@ -228,13 +255,13 @@ Output example in json format.
       },
       "idle": {
         "name": "CPU % idle",
-        "raw": 97,
-        "display": "97 %"
+        "raw": 90.5,
+        "display": "90.5 %"
       },
       "io_wait": {
         "name": "CPU % IO wait",
-        "raw": 0.4,
-        "display": "0.4 %"
+        "raw": 3.1,
+        "display": "3.1 %"
       },
       "hardware_interrupts": {
         "name": "CPU % hardware interrupts",
@@ -243,8 +270,8 @@ Output example in json format.
       },
       "software_interrupts": {
         "name": "CPU % software interrupts",
-        "raw": 0.1,
-        "display": "0.1 %"
+        "raw": 0.2,
+        "display": "0.2 %"
       },
       "steal": {
         "name": "CPU % steal",
@@ -261,15 +288,15 @@ Output example in json format.
         },
         "used": {
           "name": "Used physical memory",
-          "raw": 495267840,
-          "display": "472 MiB",
-          "percentage": "97.39 %"
+          "raw": 494587904,
+          "display": "471 MiB",
+          "percentage": "97.26 %"
         },
         "free": {
           "name": "Free physical memory",
-          "raw": 13250560,
-          "display": "12 MiB",
-          "percentage": "2.6 %"
+          "raw": 13930496,
+          "display": "13 MiB",
+          "percentage": "2.73 %"
         },
         "shared": {
           "name": "Shared physical memory",
@@ -279,15 +306,15 @@ Output example in json format.
         },
         "buffers": {
           "name": "Buffers physical memory",
-          "raw": 46534656,
-          "display": "44 MiB",
-          "percentage": "9.15 %"
+          "raw": 53800960,
+          "display": "51 MiB",
+          "percentage": "10.57 %"
         },
         "cached": {
           "name": "Cached physical memory",
-          "raw": 382058496,
-          "display": "364 MiB",
-          "percentage": "75.13 %"
+          "raw": 359620608,
+          "display": "342 MiB",
+          "percentage": "70.71 %"
         }
       },
       "swap": {
@@ -318,11 +345,17 @@ Output example in json format.
         "raw": 15633403904,
         "display": "14909 MiB"
       },
+      "used": {
+        "name": "/ used",
+        "raw": 3240251392,
+        "display": "3090 MiB",
+        "percentage": "20.72 %"
+      },
       "free": {
         "name": "/ free",
-        "raw": 11957030912,
-        "display": "11403 MiB",
-        "percentage": "76.48 %"
+        "raw": 11711664128,
+        "display": "11169 MiB",
+        "percentage": "74.91 %"
       },
       "inodes_total": {
         "name": "/ inodes total",
@@ -330,21 +363,13 @@ Output example in json format.
       },
       "inodes_used": {
         "name": "/ inodes used",
-        "raw": 90613,
-        "percentage": "9.46 %"
+        "raw": 93557,
+        "percentage": "9.76 %"
       },
       "inodes_free": {
         "name": "/ inodes free",
-        "raw": 867099,
-        "percentage": "90.53 %"
-      }
-    },
-    "function hasOwnProperty() { [native code] }": {
-      "used": {
-        "name": "/boot used",
-        "raw": 10125312,
-        "display": "9 MiB",
-        "percentage": "17.26 %"
+        "raw": 864155,
+        "percentage": "90.23 %"
       }
     },
     "/media/MyBook2": {
@@ -353,9 +378,15 @@ Output example in json format.
         "raw": 1968842792960,
         "display": "1877634 MiB"
       },
+      "used": {
+        "name": "/media/MyBook2 used",
+        "raw": 108893212672,
+        "display": "103848 MiB",
+        "percentage": "5.53 %"
+      },
       "free": {
         "name": "/media/MyBook2 free",
-        "raw": 1759914823680,
+        "raw": 1759914594304,
         "display": "1678385 MiB",
         "percentage": "89.38 %"
       },
@@ -365,12 +396,12 @@ Output example in json format.
       },
       "inodes_used": {
         "name": "/media/MyBook2 inodes used",
-        "raw": 1187,
+        "raw": 1235,
         "percentage": "0 %"
       },
       "inodes_free": {
         "name": "/media/MyBook2 inodes free",
-        "raw": 122092381,
+        "raw": 122092333,
         "percentage": "99.99 %"
       }
     },
@@ -380,11 +411,17 @@ Output example in json format.
         "raw": 58662912,
         "display": "55 MiB"
       },
+      "used": {
+        "name": "/boot used",
+        "raw": 15081472,
+        "display": "14 MiB",
+        "percentage": "25.7 %"
+      },
       "free": {
         "name": "/boot free",
-        "raw": 48537600,
-        "display": "46 MiB",
-        "percentage": "82.73 %"
+        "raw": 43581440,
+        "display": "41 MiB",
+        "percentage": "74.29 %"
       },
       "inodes_total": {
         "name": "/boot inodes total",
@@ -397,6 +434,118 @@ Output example in json format.
       "inodes_free": {
         "name": "/boot inodes free",
         "raw": 0
+      }
+    }
+  },
+  "network": {
+    "hostname": {
+      "name": "Hostname",
+      "raw": "raspberrypi"
+    },
+    "interfaces": {
+      "lo": {
+        "rx_bytes": {
+          "name": "lo receive bytes",
+          "raw": 6404,
+          "display": "6 KiB"
+        },
+        "rx_packets": {
+          "name": "lo receive packets",
+          "raw": 114
+        },
+        "rx_errors": {
+          "name": "lo receive errors",
+          "raw": 0
+        },
+        "rx_dropped": {
+          "name": "lo receive dropped",
+          "raw": 0
+        },
+        "rx_overrun": {
+          "name": "lo receive overrun",
+          "raw": 0
+        },
+        "rx_mcast": {
+          "name": "lo receive multicast",
+          "raw": 0
+        },
+        "tx_bytes": {
+          "name": "lo transmit bytes",
+          "raw": 6404,
+          "display": "6 KiB"
+        },
+        "tx_packets": {
+          "name": "lo transmit packets",
+          "raw": 114
+        },
+        "tx_errors": {
+          "name": "lo transmit errors",
+          "raw": 0
+        },
+        "tx_dropped": {
+          "name": "lo transmit dropped",
+          "raw": 0
+        },
+        "tx_carrier": {
+          "name": "lo transmit carrier",
+          "raw": 0
+        },
+        "tx_collsns": {
+          "name": "lo transmit collisions",
+          "raw": 0
+        }
+      },
+      "eth0": {
+        "rx_bytes": {
+          "name": "eth0 receive bytes",
+          "raw": 195076045,
+          "display": "186 MiB"
+        },
+        "rx_packets": {
+          "name": "eth0 receive packets",
+          "raw": 351131
+        },
+        "rx_errors": {
+          "name": "eth0 receive errors",
+          "raw": 0
+        },
+        "rx_dropped": {
+          "name": "eth0 receive dropped",
+          "raw": 0
+        },
+        "rx_overrun": {
+          "name": "eth0 receive overrun",
+          "raw": 0
+        },
+        "rx_mcast": {
+          "name": "eth0 receive multicast",
+          "raw": 0
+        },
+        "tx_bytes": {
+          "name": "eth0 transmit bytes",
+          "raw": 275446642,
+          "display": "262 MiB"
+        },
+        "tx_packets": {
+          "name": "eth0 transmit packets",
+          "raw": 402326
+        },
+        "tx_errors": {
+          "name": "eth0 transmit errors",
+          "raw": 0
+        },
+        "tx_dropped": {
+          "name": "eth0 transmit dropped",
+          "raw": 0
+        },
+        "tx_carrier": {
+          "name": "eth0 transmit carrier",
+          "raw": 0
+        },
+        "tx_collsns": {
+          "name": "eth0 transmit collisions",
+          "raw": 0
+        }
       }
     }
   }

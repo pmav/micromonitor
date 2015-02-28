@@ -15,6 +15,8 @@ module.exports = {
     free();
     df();
     dfi();
+    hostname();
+    iplink();
   }
 };
 
@@ -163,6 +165,61 @@ function dfi()
                 data.partitions[mountPoint].inodes_total = Number(tokens[1]);
                 data.partitions[mountPoint].inodes_used = Number(tokens[2]);
                 data.partitions[mountPoint].inodes_free = Number(tokens[3]);
+            }
+        });
+}
+
+function hostname()
+{
+    execute('hostname',
+        function(output) {
+            data.network = data.network || {};
+            data.network.hostname = output.trim();
+        });
+}
+
+function iplink()
+{
+    execute('ip -s link',
+        function(output) {
+            data.network = data.network || {};
+            data.network.interface = {};
+            
+            var networkInterface = undefined;
+            var lines = output.trim().split('\n');
+            var state = 0;
+            
+            for (var i = 0; i < lines.length; i++) {
+                switch (state) {
+                    case 0:
+                        networkInterface = lines[i].split(':')[1].trim()
+                        break;
+                    case 3:
+                        var rx = lines[i].trim().replace(/\s+/g, ' ').split(' ')
+                        data.network.interface[networkInterface] = data.network.interface[networkInterface] || {};
+                        data.network.interface[networkInterface].rx = {}
+                        var ref = data.network.interface[networkInterface].rx;
+                        ref.bytes = Number(rx[0]);
+                        ref.packets = Number(rx[1]);
+                        ref.errors = Number(rx[2]);
+                        ref.dropped = Number(rx[3]);
+                        ref.overrun = Number(rx[4]);
+                        ref.mcast = Number(rx[5]);
+                        break;
+                    case 5:
+                        var tx = lines[i].trim().replace(/\s+/g, ' ').split(' ')
+                        data.network.interface[networkInterface] = data.network.interface[networkInterface] || {};
+                        data.network.interface[networkInterface].tx = {};
+                        var ref = data.network.interface[networkInterface].tx;
+                        ref.bytes = Number(tx[0]);
+                        ref.packets = Number(tx[1]);
+                        ref.errors = Number(tx[2]);
+                        ref.dropped = Number(tx[3]);
+                        ref.carrier = Number(tx[4]);
+                        ref.collsns = Number(tx[5]);
+                        break;
+                }
+                state = (state + 1) % 6;
             }
         });
 }

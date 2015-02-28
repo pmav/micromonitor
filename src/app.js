@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var commands = require('./commands');
-var version = '0.0.4';
+var version = '0.0.5';
 var executionTime;
 
 function main()
@@ -89,14 +89,34 @@ function createStats(data)
   }
 
   // Network
-  // TODO
+  set(stats, 'network.hostname', 'Hostname', data.network.hostname);
+
+  for (var property in data.network.interface) {
+    if (data.network.interface.hasOwnProperty(property)) {
+      var networkInterface = data.network.interface[property];
+
+      set(stats, 'network.interfaces.' + property + '.rx_bytes', property + ' receive bytes', networkInterface.rx.bytes, bytesToDisplay);
+      set(stats, 'network.interfaces.' + property + '.rx_packets', property + ' receive packets', networkInterface.rx.packets);
+      set(stats, 'network.interfaces.' + property + '.rx_errors', property + ' receive errors', networkInterface.rx.errors);
+      set(stats, 'network.interfaces.' + property + '.rx_dropped', property + ' receive dropped', networkInterface.rx.dropped);
+      set(stats, 'network.interfaces.' + property + '.rx_overrun', property + ' receive overrun', networkInterface.rx.overrun);
+      set(stats, 'network.interfaces.' + property + '.rx_mcast', property + ' receive multicast', networkInterface.rx.mcast);
+      
+      set(stats, 'network.interfaces.' + property + '.tx_bytes', property + ' transmit bytes', networkInterface.tx.bytes, bytesToDisplay);
+      set(stats, 'network.interfaces.' + property + '.tx_packets', property + ' transmit packets', networkInterface.tx.packets);
+      set(stats, 'network.interfaces.' + property + '.tx_errors', property + ' transmit errors', networkInterface.tx.errors);
+      set(stats, 'network.interfaces.' + property + '.tx_dropped', property + ' transmit dropped', networkInterface.tx.dropped);
+      set(stats, 'network.interfaces.' + property + '.tx_carrier', property + ' transmit carrier', networkInterface.tx.carrier);
+      set(stats, 'network.interfaces.' + property + '.tx_collsns', property + ' transmit collisions', networkInterface.tx.collsns);
+    }
+  }
 
   // Processes
   // TODO
 
   // Output
   // TODO yargs
-  //toJson(stats);
+  toJson(stats);
   toPlain(stats);
 }
 
