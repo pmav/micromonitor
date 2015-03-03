@@ -2,6 +2,8 @@
 
 micromonitor is a fast linux command line tool that outputs a number of metrics from your OS in plain text or json format.
 
+Create micromonitor (package) and micromonitor-cli
+
 ### How to use
 
 TODO
@@ -33,11 +35,24 @@ TODO
  - Space: total, used, free
  - Inodes: total, used, free
 
-- Network (TODO)
+- Disks (TODO)
+ - reads completed successfully
+ - reads merged
+ - sectors read
+ - time spent reading (ms)
+ - writes completed
+ - writes merged
+ - sectors written
+ - time spent writing (ms)
+ - I/Os currently in progress
+ - time spent doing I/Os (ms)
+ - weighted time spent doing I/Os (ms)
+
+- Network
  - hostname
- - inet/inet6 addr
  - RX: bytes, packets, errors, dropped, overrun, mcast
  - TX: bytes, packets, errors, dropped, carrier, collsns
+ - inet/inet6 addr (TODO)
 
 - Processes (TODO)
  - TODO
@@ -68,11 +83,15 @@ Partitions:
     df -i
     cat /proc/sys/fs/file-nr (TODO)
 
+Disks:
+
+  cat /proc/diskstats (TODO)
+
 Network:
 
     hostname
     ip -s link
-    ip -s addr (TOOO) (inet/inet6)
+    ip -s addr (inet/inet6) (TOOO)
 
 Process:
 

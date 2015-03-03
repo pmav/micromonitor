@@ -4,27 +4,22 @@ var commands = require('./commands');
 var version = '0.0.5';
 var executionTime;
 
-function main()
-{
+function main() {
   // Run commands to get data.
-
   executionTime = process.hrtime === undefined ? new Date() : process.hrtime();
   commands.run(createStats);
 }
 
-function createStats(data)
-{
+function createStats(data) {
+  // Calculate commands exec time.
   if (process.hrtime === undefined) {
     executionTime = (new Date() - executionTime);
-
   } else {
     var elapsed = process.hrtime(executionTime);
     executionTime = (elapsed[0] * 1000) + Math.floor(elapsed[1] / 1000000);
   }
-  
-  var collectDate = new Date();
 
-  // Stats
+  var collectDate = new Date();
   var stats = {};
 
   // Info
@@ -70,7 +65,6 @@ function createStats(data)
   set(stats, 'cpu.memory.swap.free', 'Free swap', data.memory.swap.free, bytesToDisplay, data.memory.swap.free / data.memory.swap.total * 100);
 
   // Partitions
-
   for (var property in data.partitions) {
     if (data.partitions.hasOwnProperty(property)) {
       var partition = data.partitions[property];
@@ -88,6 +82,30 @@ function createStats(data)
     }
   }
 
+  // Disks
+  for (var property in data.disks) {
+    if (data.disks.hasOwnProperty(property)) {
+      var disk = data.disks[property];
+
+      // Reads
+      set(stats, 'disk.' + property + '.reads_completed', property + ' reads completed', disk.reads_completed_successfully);
+      set(stats, 'disk.' + property + '.reads_merged', property + ' reads merged', disk.reads_merged);
+      set(stats, 'disk.' + property + '.sectors_read', property + ' sectors read', disk.sectors_read);
+      set(stats, 'disk.' + property + '.time_reading', property + ' time reading', disk.time_spent_reading_ms, millisecondsToDisplay);
+
+      // Writes
+      set(stats, 'disk.' + property + '.writes_completed', property + ' writes completed', disk.writes_completed);
+      set(stats, 'disk.' + property + '.writes_merged', property + ' writes merged', disk.writes_merged);
+      set(stats, 'disk.' + property + '.sectors_written', property + ' sectors written', disk.sectors_written);
+      set(stats, 'disk.' + property + '.time_writing', property + ' time writing', disk.time_spent_writing_ms, millisecondsToDisplay);
+
+      // IO
+      set(stats, 'disk.' + property + '.IOs_currently_in_progress', property + ' IO in progress', disk.IOs_currently_in_progress);
+      set(stats, 'disk.' + property + '.time_spent_doing_IOs_ms', property + ' time IO', disk.time_spent_doing_IOs_ms, millisecondsToDisplay);
+      set(stats, 'disk.' + property + '.weighted_time_spent_doing_IOs_ms', property + ' weighted time IO', disk.weighted_time_spent_doing_IOs_ms, millisecondsToDisplay);
+    }
+  }
+
   // Network
   set(stats, 'network.hostname', 'Hostname', data.network.hostname);
 
@@ -101,7 +119,7 @@ function createStats(data)
       set(stats, 'network.interfaces.' + property + '.rx_dropped', property + ' receive dropped', networkInterface.rx.dropped);
       set(stats, 'network.interfaces.' + property + '.rx_overrun', property + ' receive overrun', networkInterface.rx.overrun);
       set(stats, 'network.interfaces.' + property + '.rx_mcast', property + ' receive multicast', networkInterface.rx.mcast);
-      
+
       set(stats, 'network.interfaces.' + property + '.tx_bytes', property + ' transmit bytes', networkInterface.tx.bytes, bytesToDisplay);
       set(stats, 'network.interfaces.' + property + '.tx_packets', property + ' transmit packets', networkInterface.tx.packets);
       set(stats, 'network.interfaces.' + property + '.tx_errors', property + ' transmit errors', networkInterface.tx.errors);
@@ -111,21 +129,16 @@ function createStats(data)
     }
   }
 
-  // Processes
-  // TODO
-
-  // Output
-  // TODO yargs
+  // Output (TODO yargs)
   toJson(stats);
   toPlain(stats);
 }
 
-function set(stats, key, name, rawValue, toDisplayFunction, percentageValue)
-{
+function set(stats, key, name, rawValue, toDisplayFunction, percentageValue) {
   var tokens = key.split('.');
   var ref = stats;
 
-  for (var i  = 0; i < tokens.length; i++) {
+  for (var i = 0; i < tokens.length; i++) {
     var key = tokens[i];
     if (ref[key] === undefined)
       ref[key] = {};
@@ -146,8 +159,11 @@ function set(stats, key, name, rawValue, toDisplayFunction, percentageValue)
 
 // Convert
 
-function secondsToDisplay(seconds)
-{
+function millisecondsToDisplay(milliseconds) {
+  return secondsToDisplay(Math.floor(milliseconds / 1000));
+}
+
+function secondsToDisplay(seconds) {
   seconds = Math.floor(seconds);
 
   if (seconds < 60)
@@ -160,7 +176,7 @@ function secondsToDisplay(seconds)
 
   var hours = Math.floor(minutes / 60);
   minutes = minutes % 60;
-  if (hours < 24) 
+  if (hours < 24)
     return hours + 'h ' + minutes + 'm ' + seconds + 's';
 
   var days = Math.floor(hours / 24);
@@ -168,26 +184,22 @@ function secondsToDisplay(seconds)
   return days + 'd ' + hours + 'h ' + minutes + 'm ' + seconds + 's';
 }
 
-function percentageToDisplay(float)
-{
+function percentageToDisplay(float) {
   return floatToDisplay(float) + ' %';
 }
 
-function intToDisplay(int)
-{
+function intToDisplay(int) {
   return parseInt(int, 10) + '';
 }
 
-function floatToDisplay(float)
-{
+function floatToDisplay(float) {
   return (Math.floor(float * 100) / 100) + '';
 }
 
-function bytesToDisplay(bytes)
-{
+function bytesToDisplay(bytes) {
   if (bytes < 1024)
     return bytes + ' B';
-  
+
   var kibytes = Math.floor(bytes / 1024);
   if (kibytes < 1024)
     return kibytes + ' KiB';
@@ -206,8 +218,7 @@ function dateToDisplay(milliseconds) {
 
 // Output
 
-function toPlain(stats)
-{
+function toPlain(stats) {
   var walk = function(obj) {
 
     for (var property in obj) {
@@ -228,12 +239,11 @@ function toPlain(stats)
   walk(stats);
 }
 
-function toJson(stats)
-{
+function toJson(stats) {
   console.log(JSON.stringify(stats, null, 2));
 }
 
-process.on('SIGINT', function () {
+process.on('SIGINT', function() {
   process.exit(0);
 });
 
