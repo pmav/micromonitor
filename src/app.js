@@ -129,6 +129,19 @@ function createStats(data) {
     }
   }
 
+  // Processes
+
+  for (var property in data.processes) {
+    if (data.processes.hasOwnProperty(property)) {
+      var curProcess = data.processes[property];
+
+      set(stats, 'processes.' + property + '.cpu',     property + ' % CPU',    curProcess.cpu);
+      set(stats, 'processes.' + property + '.memory',  property + ' % memory', curProcess.memory);
+      set(stats, 'processes.' + property + '.binary',  property + ' Binary',   curProcess.binary);
+      set(stats, 'processes.' + property + '.command', property + ' Command',  curProcess.command);
+    }
+  }
+
   // Output (TODO yargs)
   toJson(stats);
   toPlain(stats);

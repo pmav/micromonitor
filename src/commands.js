@@ -17,6 +17,7 @@ module.exports = {
     diskstats();
     hostname();
     iplink();
+    processes();
   }
 };
 
@@ -237,5 +238,28 @@ function iplink() {
         }
         state = (state + 1) % 6;
       }
+    });
+}
+
+function processes()
+{
+  execute('ps -eo pcpu,pmem,comm,args | sort -k 1 -r | head -11',
+    function(output) {
+      data.processes = {};
+      var lines = output.trim().split('\n');
+
+      var c = 1;
+      for (var i = 0; i < lines.length; i++) {
+        var tokens = lines[i].trim().replace(/\s+/g, ' ').split(' ');
+        if (tokens[0].indexOf('CPU') != -1)
+          continue;
+
+        var key = 'process#' + (c++);
+        data.processes[key] = {};
+        data.processes[key].cpu = Number(tokens[0]);
+        data.processes[key].memory = Number(tokens[1]);
+        data.processes[key].binary = tokens[2];
+        data.processes[key].command = tokens.splice(3, tokens.length - 1).join(' ');
+      };
     });
 }

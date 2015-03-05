@@ -47,7 +47,7 @@ TODO
  - inet/inet6 addr (TODO)
 
 - Processes
- - Top 10 by CPU: % CPU, % memory, command, arguments (TODO)
+ - Top 10 by CPU: % CPU, % memory, binary, command
 
 ## Commands
 
@@ -79,7 +79,7 @@ $ ip -s link
 $ ip -s addr (inet/inet6) (TOOO)
 
 # Processes
-$ ps -eo pcpu,pmem,comm,args | sort -k 1 -r | head -10 (TODO)
+$ ps -eo pcpu,pmem,comm,args | sort -k 1 -r | head -11
 ```
 
 ## Output
